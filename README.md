@@ -16,7 +16,7 @@ Neste desafio você deve criar uma página com uma lista de links que pode ser u
 ## Layout
 
 <div align="center">
-  <img alt="Layout do desafio" src="https://raw.githubusercontent.com/ThiLourenco/social-tree/main/assets/image.png" width="100%">
+  <img alt="Layout do desafio" src="https://raw.githubusercontent.com/ThiLourenco/countdown/main/assets/image.png" width="100%">
 
 </div>
 
