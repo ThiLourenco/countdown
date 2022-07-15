@@ -20,8 +20,6 @@
     </div>  
 
 
-
-
     .modal {
   position: fixed;
   top: 0;
@@ -107,3 +105,5 @@
   border: none;
   border-radius: 5px;
 }
+
+    

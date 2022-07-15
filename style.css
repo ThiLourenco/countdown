@@ -45,9 +45,9 @@ section {
 
 h1 {
   font-weight: 700;
-  font-size: 1.9em;
+  font-size: 1.9rem;
 
-  letter-spacing: 0.110 em;
+  letter-spacing: 0.110rem;
 
   text-transform: uppercase;
   color: var(--purple);
