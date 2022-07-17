@@ -38,12 +38,41 @@
       </div>
 
       <p>Inscreva-se para saber mais sobre o lançamento</p>
-      <button class="subscribe" onclick="openModal()">Inscreva-se</button>
+      <a href="#" class="subscribe" onclick="subscribeModel()">Inscreva-se</a>
+      
+      
     </section>
-      
+    <div class="modal-overlay">
+      <div class="modal">
+        <div id="form">
+          <h2>Inscreva-se</h2>
+
+          <form id="form" action="POST">
+            <div class="input-group">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Digite o seu e-mail"
+                required
+              />
+              <small class="handle-error description"></small>
+            </div>
+            
+            <div class="input-group actions">
+              <a href="#" class="cancel" onclick="cancelSubscribe()">Voltar</a>
+              <button><img class="save" src="./assets/sent_email_icon.svg" alt="Salvar" />Enviar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     <img class="rocket" src="./assets/rocket.svg"  alt="">
-      
+  
+    
 </main>
+
+  
   <script src="main.js"></script>
 </body>
 </html>

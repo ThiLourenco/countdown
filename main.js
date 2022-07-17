@@ -1,109 +1,175 @@
-<div class="modal modal-fade show">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Modal Title</h2>
-            <button class="close-modal-btn" onclick="closeModal()">
-              <img src="./images/xmark-solid.svg" alt="">
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Modal inner-content</p>
-            <label for="full-name-input">Nome completo</label>
-            <input type="text" name="full-name-input" id="full-name-input">
-            <label for="email-input">E-mail</label>
-            <input type="email" name="email-input" id="email-input">
-            <button type="submit" class="submit-sub-btn">Enviar inscrição</button>
-          </div>
-        </div>
-      </div>
-    </div>  
+const btnCancel = document.querySelector('.cancel');
+const btnSubscribe = document.querySelector('.new');
+const modalSubscribe = document.querySelector('.modal-overlay');
+const form = document.querySelector('form');
+// open modal
+const subscribeModel = () => {
+  modalSubscribe.classList.add('active');
+}
+// close modal
+const cancelSubscribe = () => {
+  modalSubscribe.classList.remove('active');
+}
+// handle Modal edit
+const Modal = {
+  modalOverlay: document.querySelector(".modal-overlay"),
+  modalTitle: document.querySelector("#form h2"),
+  editingIndex: -1,
 
+  toggle(isEdit = false, index = -1) {
+    Form.clearFields();
+    Modal.modalOverlay.classList.toggle("active");
 
-    .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1060;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  outline: 0;
-  display: none;
+    if (isEdit && index !== -1) {
+      const data = Transaction.all[index];
+
+      Modal.editingIndex = index;
+      Modal.modalTitle.innerHTML = "Editar transação";
+
+      Form.description.value = data.description;
+    } else {
+      Modal.modalTitle.innerHTML = "Nova transação";
+    }
+  },
+};
+
+const Form = {
+  email: document.querySelector('input#email'),
+
+  getValues() {
+    return {
+      email: Form.email.value,
+    };
+  },
+
+  validateFields() {
+    const { email } = Form.getValues();
+
+    if (email.trim() === '') {
+      document.querySelector('.handle-error.email').innerHTML = 'Informe a descrição - (Ex. Internet).';
+    } else {
+      document.querySelector('.handle-error.email').innerHTML = '';
+    }
+  },
+
+  formatValues() {
+    let { email } = Form.getValues();
+    return {
+      email
+    };
+  },
+
+  saveTransaction(transaction) {
+    Transaction.add(transaction);
+  },
+
+  clearFields() {
+    Form.description.value = '';
+    Form.amount.value = '';
+    Form.date.value = '';
+    Modal.editingIndex = -1;
+  },
 }
 
-.modal-fade {
-  transition: opacity .15s linear;
-  background-color: rgba(0,0,0,.2);
-  width: 100%;
+const handleSubmit = (e) => {
+  e.preventDefault()
+
+  try {
+    Form.validateFields()
+    const transaction = Form.formatValues()
+
+    if (Modal.editingIndex !== -1) {
+      const data = Transaction.all[Modal.editingIndex];
+      const result = confirm(
+        'Deseja confirmar a alteração do registro?'
+      );
+
+      if (result) {
+        data.email = transaction.email;
+
+        App.reload();
+      }
+    } else {
+      Form.saveTransaction(transaction);
+    }
+    Form.clearFields();
+    Modal.toggle();
+  } catch (error) {
+    console.error(error.message);
+  }
 }
 
-.modal.show .modal-dialog {
-  transform: none;
-  display: flex;
-  justify-content: center;
+const App = {
+  init() {
+    Transaction.all.forEach(DOM.addTransaction);
+
+    DOM.updateBalance();
+
+    setStorage(Transaction.all);
+  },
+  reload() {
+    DOM.clearTransactions();
+    App.init();
+  },
 }
 
-.modal.fade .modal-dialog {
-  transition: transform .3s ease-out;
-  transform: translate(0,-50px);
-}
+/* Countdown */
 
-.modal-dialog {
-  position: relative;
-  width: auto;
-  margin: 0.5rem;
-  pointer-events: none;
-}
+class Countdown {
+  constructor(current_date) {
 
-.modal-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 25%;
-  padding: 2em;
-  pointer-events: auto;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid rgba(0,0,0,.2);
-  border-radius: 0.3rem;
-  outline: 0;
-}
+    this.attCounter = null
+    this.remainingSeconds = 0
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-}
+    this.element = {
+      days: document.querySelector('.days'),
+      hours: document.querySelector('.hours'),
+      minutes: document.querySelector('.minutes'),
+      seconds: document.querySelector('.seconds'),
+    }
 
-.modal-body input {
-  width: 100%;
-}
+    // remainingSeconds = current_date - event-date
+    this.remainingSeconds = Math.floor((new Date("july 17, 2022 13:50:00").getTime() - current_date.getTime()) / 1000)
+    this.start()
+  }
 
-.close-modal-btn {
-  position: relative;
-  background-color: transparent;
-  width: 32px;
-  height: 32px;
-  border: none;
-  right: 0;
-  top: 0;
-}
+  start() {
+    if (this.remainingSeconds === 0) return;
 
-.close-modal-btn img {
-  width: 100%;
-  height: 100%;
-}
+    this.attCounter = setInterval(() => {
+      this.remainingSeconds--;
+      this.updateInterfaceTime();
 
-.submit-sub-btn {
-  margin-top: 1em;
-  padding: 0.4em 2em;
-  background-color: var(--purple);
-  font-size: 14px;
-  line-height: 2em;
-  font-family: 'Poppins', sans-serif;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-}
+      if (this.remainingSeconds === 0) {
+        this.atFinish();
+      }
+    }, 1000);
+  }
 
+  atFinish() {
+    clearInterval(this.attCounter);
+
+    this.attCounter = null;
+
+  }
+
+  updateInterfaceTime() {
+    const days = Math.floor(this.remainingSeconds / 86400);
+    const hours = Math.floor(this.remainingSeconds / 3600);
+    const minutes = Math.floor(this.remainingSeconds / 60);
+    const seconds = this.remainingSeconds % 60;
     
+    this.element.days.textContent = days.toString().padStart(2, "0"); // .padStart() > valores padrões para elementos de texto
+    this.element.hours.textContent = hours.toString().padStart(2, "0");
+    this.element.minutes.textContent = minutes.toString().padStart(2, "0");
+    this.element.seconds.textContent = seconds.toString().padStart(2, "0");
+  }
+}
+
+document.addEventListener("load", new Countdown(new Date("july 17, 2022 13:00:00"))) 
+
+btnSubscribe.addEventListener('click', subscribeModel);
+btnCancel.addEventListener('click', cancelSubscribe);
+form.addEventListener('submit', handleSubmit);
+
+App.init();
